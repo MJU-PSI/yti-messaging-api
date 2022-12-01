@@ -71,7 +71,7 @@
         <dependency>
             <groupId>fi.vm.yti</groupId>
             <artifactId>yti-spring-security</artifactId>
-            <version>0.2.0</version>
+            <version>0.2.1-SNAPSHOT</version>
         </dependency>
 
         <!-- Spring Security -->
@@ -181,6 +181,13 @@
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
             <version>2.3.1</version>
+        </dependency>
+
+        <!-- Keycloak adapter -->
+         <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-spring-security-adapter</artifactId>
+            <version>16.1.1</version>
         </dependency>
 
         <!-- Test -->
