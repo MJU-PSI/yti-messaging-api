@@ -46,6 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String LANGUAGE_FI = "fi";
     private static final String LANGUAGE_EN = "en";
     private static final String LANGUAGE_SV = "sv";
+    private static final String LANGUAGE_SL = "sl";
     private static final String LANGUAGE_UND = "und";
 
     private final UserService userService;
@@ -382,10 +383,12 @@ public class NotificationServiceImpl implements NotificationService {
 
     private String getPrefLabelValueForEmail(final Map<String, String> prefLabel) {
         if (prefLabel != null) {
-            if (prefLabel.get(LANGUAGE_FI) != null) {
-                return prefLabel.get(LANGUAGE_FI);
+            if (prefLabel.get(LANGUAGE_SL) != null) {
+                return prefLabel.get(LANGUAGE_SL);
             } else if (prefLabel.get(LANGUAGE_EN) != null) {
                 return prefLabel.get(LANGUAGE_EN);
+            } else if (prefLabel.get(LANGUAGE_FI) != null) {
+                return prefLabel.get(LANGUAGE_FI);
             } else if (prefLabel.get(LANGUAGE_SV) != null) {
                 return prefLabel.get(LANGUAGE_SV);
             } else if (prefLabel.get(LANGUAGE_UND) != null) {
