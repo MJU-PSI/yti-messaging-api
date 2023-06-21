@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
 
 @Component
 @Configuration
@@ -68,6 +69,16 @@ public class SpringAppConfig {
     @Bean
     public DataSource dataSource() {
         return new HikariDataSource();
+    }
+
+    @Bean
+    public ResourceBundleMessageSource messageSource() {
+
+        var source = new ResourceBundleMessageSource();
+        source.setBasenames("messages/labels");
+        source.setUseCodeAsDefaultMessage(true);
+
+        return source;
     }
 
     @Bean

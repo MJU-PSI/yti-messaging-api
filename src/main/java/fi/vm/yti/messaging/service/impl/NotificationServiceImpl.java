@@ -10,11 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +51,10 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String LANGUAGE_SV = "sv";
     private static final String LANGUAGE_SL = "sl";
     private static final String LANGUAGE_UND = "und";
+
+    @Autowired
+    private MessageSource messageSource;
+
 
     private final UserService userService;
     private final ResourceService resourceService;
@@ -173,33 +180,34 @@ public class NotificationServiceImpl implements NotificationService {
     private String constructMessage(final UserNotificationDTO userNotificationDto) {
         final StringBuilder builder = new StringBuilder();
         builder.append("<body>");
-        builder.append("Hyvä käyttäjä,<br/>");
+        builder.append(messageSource.getMessage("l1",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
         builder.append("<br/>");
-        builder.append("Saat tämän viestin, koska olet tilannut muutosviestit Yhteentoimivuusalustalta yhdestä tai useammasta sisällöstä. Voit perua tilauksen työkaluista Käyttäjätiedot-osiossa. Katso ohjeet <a href=\"https://vrk-ewiki.eden.csc.fi/pages/viewpage.action?pageId=61252403\">täältä</a>.");
+        builder.append("<br/>");
+        builder.append(messageSource.getMessage("l2",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
         builder.append("<br/>");
         final List<IntegrationResourceDTO> terminologyUpdates = userNotificationDto.getTerminologyResources();
         final List<IntegrationResourceDTO> codelistUpdates = userNotificationDto.getCodelistResources();
         final List<IntegrationResourceDTO> datamodelUpdates = userNotificationDto.getDatamodelResouces();
         final List<IntegrationResourceDTO> commentsUpdates = userNotificationDto.getCommentsResources();
         if (!terminologyUpdates.isEmpty()) {
-            builder.append("<h3>Sanastot</h3>");
+            builder.append("<h3>" + messageSource.getMessage("l3",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</h3>");
             addContainerUpdates(APPLICATION_TERMINOLOGY, builder, terminologyUpdates);
         }
         if (!codelistUpdates.isEmpty()) {
-            builder.append("<h3>Koodistot</h3>");
+            builder.append("<h3>" + messageSource.getMessage("l4",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</h3>");
             addContainerUpdates(APPLICATION_CODELIST, builder, codelistUpdates);
         }
         if (!datamodelUpdates.isEmpty()) {
-            builder.append("<h3>Tietomallit</h3>");
+            builder.append("<h3>" + messageSource.getMessage("l5",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</h3>");
             addContainerUpdates(APPLICATION_DATAMODEL, builder, datamodelUpdates);
         }
         if (!commentsUpdates.isEmpty()) {
-            builder.append("<h3>Kommentit</h3>");
+            builder.append("<h3>" + messageSource.getMessage("l6",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</h3>");
             addContainerUpdates(APPLICATION_COMMENTS, builder, commentsUpdates);
         }
         builder.append("<br/>");
         builder.append("<br/>");
-        builder.append("Tämä viesti on lähetetty automaattisesti. Ethän vastaa viestiin!");
+        builder.append(messageSource.getMessage("l7",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
         builder.append("</body>");
         return builder.toString();
     }
@@ -256,7 +264,7 @@ public class NotificationServiceImpl implements NotificationService {
                                          final int count) {
         builder.append("<li>");
         builder.append(count);
-        builder.append(" muutosta yhteensä");
+        builder.append(messageSource.getMessage("l8",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
         builder.append("</li>");
     }
 
@@ -267,32 +275,32 @@ public class NotificationServiceImpl implements NotificationService {
         final String typeLabel = resolveLocalizationForType(type);
         builder.append(typeLabel);
         if (statusHasChanged) {
-            builder.append(" tiedot ja tila ovat muuttuneet");
+            builder.append(messageSource.getMessage("l9",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
         } else {
-            builder.append(" tiedot ovat muuttuneet");
+            builder.append(messageSource.getMessage("l10",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
         }
         builder.append("</li>");
     }
 
     private String resolveLocalizationForType(final String type) {
         if (type == null) {
-            return "aineiston";
+            return messageSource.getMessage("l11",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
         }
         switch (type) {
             case TYPE_TERMINOLOGY:
-                return "sanaston";
+                return messageSource.getMessage("l12",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case TYPE_CODELIST:
-                return "koodiston";
+                return messageSource.getMessage("l13",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case TYPE_LIBRARY:
-                return "tietokomponenttikirjaston";
+                return messageSource.getMessage("l14",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case TYPE_PROFILE:
-                return "soveltamisprofiilin";
+                return messageSource.getMessage("l15",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case TYPE_COMMENTROUND:
-                return "kommentointikierroksen";
+                return messageSource.getMessage("l16",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case TYPE_COMMENTTHREAD:
-                return "kommentointiketjun";
+                return messageSource.getMessage("l17",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             default:
-                return "aineiston";
+                return messageSource.getMessage("l11",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
         }
     }
 
@@ -300,7 +308,7 @@ public class NotificationServiceImpl implements NotificationService {
                                            final StringBuilder builder,
                                            final Set<IntegrationResourceDTO> resources) {
         if (resources != null && !resources.isEmpty()) {
-            builder.append("<li>uudet resurssit</li>");
+            builder.append("<li>" + messageSource.getMessage("l18",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</li>");
             builder.append("<ul>");
             resources.forEach(resource -> addResourceToBuilder(true, applicationIdentifier, builder, resource));
             builder.append("</ul>");
@@ -311,7 +319,7 @@ public class NotificationServiceImpl implements NotificationService {
                                                   final StringBuilder builder,
                                                   final Set<IntegrationResourceDTO> resources) {
         if (resources != null && !resources.isEmpty()) {
-            builder.append("<li>muuttuneet resurssit ja tilat</li>");
+            builder.append("<li>" + messageSource.getMessage("l19",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</li>");
             builder.append("<ul>");
             resources.forEach(resource -> addResourceToBuilder(true, applicationIdentifier, builder, resource));
             builder.append("</ul>");
@@ -322,7 +330,7 @@ public class NotificationServiceImpl implements NotificationService {
                                                    final StringBuilder builder,
                                                    final Set<IntegrationResourceDTO> resources) {
         if (resources != null && !resources.isEmpty()) {
-            builder.append("<li>muuttuneet resurssit</li>");
+            builder.append("<li>" + messageSource.getMessage("l20",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</li>");
             builder.append("<ul>");
             resources.forEach(resource -> addResourceToBuilder(true, applicationIdentifier, builder, resource));
             builder.append("</ul>");
@@ -369,7 +377,7 @@ public class NotificationServiceImpl implements NotificationService {
             final Date contentModified = resource.getContentModified();
             final Date contentModifiedComparisonDate = createAfterDateForModifiedComparison();
             if (contentModified != null && (contentModified.after(contentModifiedComparisonDate) || contentModified.equals(contentModifiedComparisonDate))) {
-                builder.append(" tietosisältöön on tullut uusia kommentteja");
+                builder.append(messageSource.getMessage("l21",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
             }
         }
         if (wrapToList) {
@@ -403,27 +411,27 @@ public class NotificationServiceImpl implements NotificationService {
     private String localizeStatus(final String status) {
         switch (status) {
             case "VALID":
-                return "Voimassa oleva";
+                return messageSource.getMessage("l22",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "INCOMPLETE":
-                return "Keskeneräinen";
+                return messageSource.getMessage("l23",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "DRAFT":
-                return "Luonnos";
+                return messageSource.getMessage("l24",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "SUGGESTED":
-                return "Ehdotus";
+                return messageSource.getMessage("l25",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "SUPERSEDED":
-                return "Korvattu";
+                return messageSource.getMessage("l26",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "RETIRED":
-                return "Poistettu käytöstä";
+                return messageSource.getMessage("l27",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "INVALID":
-                return "Virheellinen";
+                return messageSource.getMessage("l28",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "INPROGRESS":
-                return "Käynnissä";
+                return messageSource.getMessage("l29",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "AWAIT":
-                return "Odottaa";
+                return messageSource.getMessage("l30",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "ENDED":
-                return "Päättynyt";
+                return messageSource.getMessage("l31",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             case "CLOSED":
-                return "Suljettu";
+                return messageSource.getMessage("l32",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
             default:
                 return status;
         }
