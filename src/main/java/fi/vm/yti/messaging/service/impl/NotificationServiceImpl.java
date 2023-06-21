@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fi.vm.yti.messaging.api.Meta;
+import fi.vm.yti.messaging.configuration.MessagingProperties;
 import fi.vm.yti.messaging.configuration.MessagingServiceProperties;
 import fi.vm.yti.messaging.dto.IntegrationResourceDTO;
 import fi.vm.yti.messaging.dto.IntegrationResponseDTO;
@@ -38,7 +39,6 @@ import fi.vm.yti.messaging.service.ResourceService;
 import fi.vm.yti.messaging.service.UserService;
 import static fi.vm.yti.messaging.api.ApiConstants.*;
 import static fi.vm.yti.messaging.util.ApplicationUtils.*;
-import static fi.vm.yti.messaging.util.ApplicationUtils.createAfterDateForModifiedComparison;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -48,9 +48,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     private static final String LANGUAGE_FI = "fi";
     private static final String LANGUAGE_EN = "en";
-    private static final String LANGUAGE_SV = "sv";
+    // private static final String LANGUAGE_SV = "sv";
     private static final String LANGUAGE_SL = "sl";
-    private static final String LANGUAGE_UND = "und";
+    // private static final String LANGUAGE_UND = "und";
 
     @Autowired
     private MessageSource messageSource;
@@ -61,18 +61,21 @@ public class NotificationServiceImpl implements NotificationService {
     private final EmailService emailService;
     private final IntegrationService integrationService;
     private final MessagingServiceProperties messagingServiceProperties;
+    private final MessagingProperties messagingProperties;
 
     @Inject
     public NotificationServiceImpl(final UserService userService,
                                    final ResourceService resourceService,
                                    final EmailService emailService,
                                    final IntegrationService integrationService,
-                                   final MessagingServiceProperties messagingServiceProperties) {
+                                   final MessagingServiceProperties messagingServiceProperties,
+                                   final MessagingProperties messagingProperties) {
         this.userService = userService;
         this.resourceService = resourceService;
         this.emailService = emailService;
         this.integrationService = integrationService;
         this.messagingServiceProperties = messagingServiceProperties;
+        this.messagingProperties = messagingProperties;
     }
 
     @Scheduled(cron = "0 0 7 * * *", zone = "Europe/Helsinki")
@@ -180,34 +183,34 @@ public class NotificationServiceImpl implements NotificationService {
     private String constructMessage(final UserNotificationDTO userNotificationDto) {
         final StringBuilder builder = new StringBuilder();
         builder.append("<body>");
-        builder.append(messageSource.getMessage("l1",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
+        builder.append(messageSource.getMessage("l1",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())));
         builder.append("<br/>");
         builder.append("<br/>");
-        builder.append(messageSource.getMessage("l2",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
+        builder.append(messageSource.getMessage("l2",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())));
         builder.append("<br/>");
         final List<IntegrationResourceDTO> terminologyUpdates = userNotificationDto.getTerminologyResources();
         final List<IntegrationResourceDTO> codelistUpdates = userNotificationDto.getCodelistResources();
         final List<IntegrationResourceDTO> datamodelUpdates = userNotificationDto.getDatamodelResouces();
         final List<IntegrationResourceDTO> commentsUpdates = userNotificationDto.getCommentsResources();
         if (!terminologyUpdates.isEmpty()) {
-            builder.append("<h3>" + messageSource.getMessage("l3",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</h3>");
+            builder.append("<h3>" + messageSource.getMessage("l3",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())) + "</h3>");
             addContainerUpdates(APPLICATION_TERMINOLOGY, builder, terminologyUpdates);
         }
         if (!codelistUpdates.isEmpty()) {
-            builder.append("<h3>" + messageSource.getMessage("l4",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</h3>");
+            builder.append("<h3>" + messageSource.getMessage("l4",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())) + "</h3>");
             addContainerUpdates(APPLICATION_CODELIST, builder, codelistUpdates);
         }
         if (!datamodelUpdates.isEmpty()) {
-            builder.append("<h3>" + messageSource.getMessage("l5",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</h3>");
+            builder.append("<h3>" + messageSource.getMessage("l5",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())) + "</h3>");
             addContainerUpdates(APPLICATION_DATAMODEL, builder, datamodelUpdates);
         }
         if (!commentsUpdates.isEmpty()) {
-            builder.append("<h3>" + messageSource.getMessage("l6",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</h3>");
+            builder.append("<h3>" + messageSource.getMessage("l6",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())) + "</h3>");
             addContainerUpdates(APPLICATION_COMMENTS, builder, commentsUpdates);
         }
         builder.append("<br/>");
         builder.append("<br/>");
-        builder.append(messageSource.getMessage("l7",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
+        builder.append(messageSource.getMessage("l7",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())));
         builder.append("</body>");
         return builder.toString();
     }
@@ -264,7 +267,7 @@ public class NotificationServiceImpl implements NotificationService {
                                          final int count) {
         builder.append("<li>");
         builder.append(count);
-        builder.append(messageSource.getMessage("l8",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
+        builder.append(messageSource.getMessage("l8",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())));
         builder.append("</li>");
     }
 
@@ -275,32 +278,32 @@ public class NotificationServiceImpl implements NotificationService {
         final String typeLabel = resolveLocalizationForType(type);
         builder.append(typeLabel);
         if (statusHasChanged) {
-            builder.append(messageSource.getMessage("l9",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
+            builder.append(messageSource.getMessage("l9",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())));
         } else {
-            builder.append(messageSource.getMessage("l10",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
+            builder.append(messageSource.getMessage("l10",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())));
         }
         builder.append("</li>");
     }
 
     private String resolveLocalizationForType(final String type) {
         if (type == null) {
-            return messageSource.getMessage("l11",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+            return messageSource.getMessage("l11",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
         }
         switch (type) {
             case TYPE_TERMINOLOGY:
-                return messageSource.getMessage("l12",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l12",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case TYPE_CODELIST:
-                return messageSource.getMessage("l13",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l13",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case TYPE_LIBRARY:
-                return messageSource.getMessage("l14",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l14",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case TYPE_PROFILE:
-                return messageSource.getMessage("l15",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l15",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case TYPE_COMMENTROUND:
-                return messageSource.getMessage("l16",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l16",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case TYPE_COMMENTTHREAD:
-                return messageSource.getMessage("l17",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l17",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             default:
-                return messageSource.getMessage("l11",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l11",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
         }
     }
 
@@ -308,7 +311,7 @@ public class NotificationServiceImpl implements NotificationService {
                                            final StringBuilder builder,
                                            final Set<IntegrationResourceDTO> resources) {
         if (resources != null && !resources.isEmpty()) {
-            builder.append("<li>" + messageSource.getMessage("l18",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</li>");
+            builder.append("<li>" + messageSource.getMessage("l18",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())) + "</li>");
             builder.append("<ul>");
             resources.forEach(resource -> addResourceToBuilder(true, applicationIdentifier, builder, resource));
             builder.append("</ul>");
@@ -319,7 +322,7 @@ public class NotificationServiceImpl implements NotificationService {
                                                   final StringBuilder builder,
                                                   final Set<IntegrationResourceDTO> resources) {
         if (resources != null && !resources.isEmpty()) {
-            builder.append("<li>" + messageSource.getMessage("l19",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</li>");
+            builder.append("<li>" + messageSource.getMessage("l19",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())) + "</li>");
             builder.append("<ul>");
             resources.forEach(resource -> addResourceToBuilder(true, applicationIdentifier, builder, resource));
             builder.append("</ul>");
@@ -330,7 +333,7 @@ public class NotificationServiceImpl implements NotificationService {
                                                    final StringBuilder builder,
                                                    final Set<IntegrationResourceDTO> resources) {
         if (resources != null && !resources.isEmpty()) {
-            builder.append("<li>" + messageSource.getMessage("l20",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())) + "</li>");
+            builder.append("<li>" + messageSource.getMessage("l20",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())) + "</li>");
             builder.append("<ul>");
             resources.forEach(resource -> addResourceToBuilder(true, applicationIdentifier, builder, resource));
             builder.append("</ul>");
@@ -377,7 +380,7 @@ public class NotificationServiceImpl implements NotificationService {
             final Date contentModified = resource.getContentModified();
             final Date contentModifiedComparisonDate = createAfterDateForModifiedComparison();
             if (contentModified != null && (contentModified.after(contentModifiedComparisonDate) || contentModified.equals(contentModifiedComparisonDate))) {
-                builder.append(messageSource.getMessage("l21",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
+                builder.append(messageSource.getMessage("l21",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())));
             }
         }
         if (wrapToList) {
@@ -391,16 +394,29 @@ public class NotificationServiceImpl implements NotificationService {
 
     private String getPrefLabelValueForEmail(final Map<String, String> prefLabel) {
         if (prefLabel != null) {
-            if (prefLabel.get(LANGUAGE_SL) != null) {
-                return prefLabel.get(LANGUAGE_SL);
-            } else if (prefLabel.get(LANGUAGE_EN) != null) {
-                return prefLabel.get(LANGUAGE_EN);
-            } else if (prefLabel.get(LANGUAGE_FI) != null) {
-                return prefLabel.get(LANGUAGE_FI);
-            } else if (prefLabel.get(LANGUAGE_SV) != null) {
-                return prefLabel.get(LANGUAGE_SV);
-            } else if (prefLabel.get(LANGUAGE_UND) != null) {
-                return prefLabel.get(LANGUAGE_UND);
+            String label = null;
+            String labelSl = null;
+            String labelEn = null;
+            String labelFi = null;
+
+            if (this.messagingProperties.getDefaultLanguage() == LANGUAGE_SL) {
+                label = prefLabel.get(LANGUAGE_SL);
+                labelSl = label;
+            } else if (this.messagingProperties.getDefaultLanguage() == LANGUAGE_EN) {
+                label = prefLabel.get(LANGUAGE_EN);
+                labelEn = label;
+            } else if (this.messagingProperties.getDefaultLanguage() == LANGUAGE_FI) {
+                label = prefLabel.get(LANGUAGE_FI);
+                labelFi = label;
+            }
+            if (label != null) {
+                return label;
+            } else if (labelSl != null) {
+                return labelSl;
+            } else if (labelEn != null) {
+                return labelEn;
+            } else if (labelFi != null) {
+                return labelFi;
             } else {
                 return prefLabel.get(0);
             }
@@ -411,27 +427,27 @@ public class NotificationServiceImpl implements NotificationService {
     private String localizeStatus(final String status) {
         switch (status) {
             case "VALID":
-                return messageSource.getMessage("l22",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l22",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "INCOMPLETE":
-                return messageSource.getMessage("l23",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l23",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "DRAFT":
-                return messageSource.getMessage("l24",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l24",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "SUGGESTED":
-                return messageSource.getMessage("l25",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l25",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "SUPERSEDED":
-                return messageSource.getMessage("l26",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l26",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "RETIRED":
-                return messageSource.getMessage("l27",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l27",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "INVALID":
-                return messageSource.getMessage("l28",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l28",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "INPROGRESS":
-                return messageSource.getMessage("l29",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l29",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "AWAIT":
-                return messageSource.getMessage("l30",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l30",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "ENDED":
-                return messageSource.getMessage("l31",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l31",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             case "CLOSED":
-                return messageSource.getMessage("l32",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage()));
+                return messageSource.getMessage("l32",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage()));
             default:
                 return status;
         }

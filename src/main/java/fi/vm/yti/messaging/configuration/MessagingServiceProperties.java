@@ -15,7 +15,6 @@ public class MessagingServiceProperties {
     private String contextPath;
 
     private String env;
-    private String defaultLanguage;
 
     public String getEnv() {
         return env;
@@ -31,13 +30,5 @@ public class MessagingServiceProperties {
 
     public void setContextPath(final String contextPath) {
         this.contextPath = contextPath;
-    }
-
-    public String getDefaultLanguage() {
-        return this.defaultLanguage != null ? this.defaultLanguage : "en";
-    }
-
-    public void setDefaultLanguage(String defaultLanguage) {
-        this.defaultLanguage = defaultLanguage;
     }
 }

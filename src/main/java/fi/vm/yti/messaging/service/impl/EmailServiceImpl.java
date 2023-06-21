@@ -18,7 +18,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import fi.vm.yti.messaging.configuration.MessagingServiceProperties;
+import fi.vm.yti.messaging.configuration.MessagingProperties;
 import fi.vm.yti.messaging.service.EmailService;
 import fi.vm.yti.messaging.service.UserLookupService;
 import static javax.mail.Message.RecipientType.TO;
@@ -31,7 +31,7 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private final String adminEmail;
     
-    private final MessagingServiceProperties messagingServiceProperties;
+    private final MessagingProperties messagingProperties;
 
     @Autowired
     private MessageSource messageSource;
@@ -39,11 +39,11 @@ public class EmailServiceImpl implements EmailService {
     @Inject
     public EmailServiceImpl(final UserLookupService userLookupService,
                             final JavaMailSender javaMailSender,
-                            final MessagingServiceProperties messagingServiceProperties,
+                            final MessagingProperties messagingProperties,
                             @Value("${admin.email}") String adminEmail) {
         this.userLookupService = userLookupService;
         this.javaMailSender = javaMailSender;
-        this.messagingServiceProperties = messagingServiceProperties;
+        this.messagingProperties = messagingProperties;
         this.adminEmail = adminEmail;
     }
 
@@ -67,7 +67,7 @@ public class EmailServiceImpl implements EmailService {
                 mail.setRecipient(TO, createAddress(emailAddress));
                 mail.setFrom(createAddress(adminEmail));
                 mail.setSender(createAddress(adminEmail));
-                mail.setSubject(messageSource.getMessage("l33",null, Locale.forLanguageTag(messagingServiceProperties.getDefaultLanguage())));
+                mail.setSubject(messageSource.getMessage("l33",null, Locale.forLanguageTag(messagingProperties.getDefaultLanguage())));
                 mail.setContent(message, "text/html; charset=UTF-8");
                 javaMailSender.send(mail);
             } else {
