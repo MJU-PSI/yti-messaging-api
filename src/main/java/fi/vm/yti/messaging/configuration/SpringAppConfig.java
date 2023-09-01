@@ -77,6 +77,7 @@ public class SpringAppConfig {
         var source = new ResourceBundleMessageSource();
         source.setBasenames("messages/labels");
         source.setUseCodeAsDefaultMessage(true);
+        source.setDefaultEncoding("UTF-8");
 
         return source;
     }
