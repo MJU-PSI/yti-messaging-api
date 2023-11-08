@@ -193,7 +193,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     private void setAfterAndBefore(final IntegrationResourceRequestDTO integrationResourceRequestDto,
                                    final boolean getLatest) {
-        final TimeZone tz = TimeZone.getTimeZone("Europe/Helsinki");
+        final TimeZone tz = TimeZone.getTimeZone("Europe/Ljubljana");
         final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         df.setTimeZone(tz);
         final String after = df.format(yesterday()) + DATE_SUFFIX;

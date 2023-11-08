@@ -39,7 +39,7 @@ public class ContainerNameServiceImpl implements ContainerNameService {
         this.integrationService = integrationService;
     }
 
-    @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Helsinki")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Ljubljana")
     public void refreshPrefLabels() {
         fetchAndCachePrefLabelsForContainers(APPLICATION_CODELIST);
         fetchAndCachePrefLabelsForContainers(APPLICATION_DATAMODEL);
